@@ -18,10 +18,6 @@ class Header extends StatelessWidget {
             'Block Explorer',
             style: Theme.of(context).textTheme.headline6,
           ),
-          // IconButton(
-          //   icon: Icon(Icons.nights_stay_outlined),
-          //   onPressed: () {},
-          // ),
         ],
       ),
     );

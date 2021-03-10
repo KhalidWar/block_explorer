@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:block_explorer/constant_secret.dart';
+import 'package:block_explorer/models/tx_model.dart';
 import 'package:http/http.dart' as http;
 
 import '../constant_secret.dart';
@@ -21,42 +24,20 @@ class APIServices {
     }
   }
 
-  Future getTxList() async {
+  Future<TxDataModel> getTxList(String address) async {
     final url =
-        '$kBaseURL?module=$kModule&action=$kActionTxList&address=$kMetaMask&tag=$kTagLatest&apikey=$kAPIKey';
+        '$kBaseURL?module=$kModule&action=$kActionTxList&address=$address&tag=$kTagLatest&apikey=$kAPIKey';
 
     try {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        print(response.body);
-        return response.body;
+        return TxDataModel.fromJson(jsonDecode(response.body));
+      } else {
+        return null;
       }
     } catch (e) {
       throw e;
     }
   }
-
-// Stream<AliasModel> getAllAliasesData() async* {
-//   try {
-//     final accessToken = await AccessTokenService().getAccessToken();
-//     _headers["Authorization"] = "Bearer $accessToken";
-//
-//     final response = await http.get(
-//         Uri.encodeFull('$kBaseURL/$kAliasesURL?deleted=with'),
-//         headers: _headers);
-//
-//     if (response.statusCode == 200) {
-//       print('getAllAliasesData ${response.statusCode}');
-//       yield AliasModel.fromJson(jsonDecode(response.body));
-//     } else {
-//       print('getAllAliasesData ${response.statusCode}');
-//       throw APIMessageHandler().getStatusCodeMessage(response.statusCode);
-//     }
-//   } catch (e) {
-//     throw e;
-//   }
-// }
-// '$kBaseURL?module=$kModule&action=$kAction&address=$kAddress&tag=$kTagLatest&apikey=$kAPIKey',
-
 }

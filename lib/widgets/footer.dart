@@ -12,14 +12,16 @@ class Footer extends StatelessWidget {
       color: Colors.grey[200],
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Text('Footer'),
-          SizedBox(width: size.width * 0.01),
-          Text('About'),
-          SizedBox(width: size.width * 0.01),
-          Spacer(),
-          Text('Created by Khalidwar.com'),
+          InkWell(
+            child: Text(
+              'Created by Khalidwar.com',
+            ),
+            onTap: () {
+              //todo navigate URL launcher to KhalidWar's website
+            },
+          ),
           SizedBox(width: size.width * 0.01),
           InkWell(
             child: Text('Powered by Etherscan.io\'s API'),

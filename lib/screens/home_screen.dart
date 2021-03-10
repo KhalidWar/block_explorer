@@ -1,5 +1,7 @@
+import 'package:block_explorer/screens/result_screen.dart';
 import 'package:block_explorer/services/api_services.dart';
 import 'package:block_explorer/widgets/header.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -11,18 +13,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final textEditingController = TextEditingController();
   final apiService = APIServices();
-  String test = '';
+  final formKey = GlobalKey<FormState>();
+  final textEditingController = TextEditingController();
 
-  doIt() async {
-    test = await apiService.getAccountBalance();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // doIt();
+  String validateInput(String input) {
+    if (input.isEmpty || input == null) {
+      return 'Please provide a valid Eth Wallet Address';
+    }
+    return null;
   }
 
   @override
@@ -38,35 +37,48 @@ class _HomeScreenState extends State<HomeScreen> {
             Header(),
             Column(
               children: [
-                // Text(
-                //   'Block Explorer',
-                //   style: Theme.of(context)
-                //       .textTheme
-                //       .headline4
-                //       .copyWith(fontSize: size.width * 0.03),
-                // ),
                 Container(
                   height: size.height * 0.3,
                   child: Lottie.asset('lottie/search.json'),
                 ),
                 Container(
                   width: size.width * 0.3,
-                  child: TextFormField(
-                    controller: textEditingController,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(10),
-                      hintText: 'Search for anything',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
+                  child: Form(
+                    key: formKey,
+                    child: TextFormField(
+                      controller: textEditingController,
+                      validator: (input) => validateInput(input),
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(10),
+                        hintText: 'Search for anything',
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                       ),
                     ),
                   ),
                 ),
                 SizedBox(height: size.height * 0.03),
-                RaisedButton(
+                ElevatedButton(
                   child: Text('Search'),
-                  onPressed: () {},
+                  onPressed: () async {
+                    if (formKey.currentState.validate()) {
+                      await apiService
+                          .getTxList(textEditingController.text.trim())
+                          .then(
+                        (value) {
+                          return Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return ResultScreen(txModelList: value.result);
+                              },
+                            ),
+                          ).whenComplete(() => textEditingController.clear());
+                        },
+                      );
+                    }
+                  },
                 ),
               ],
             ),
