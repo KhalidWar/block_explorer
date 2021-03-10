@@ -1,3 +1,4 @@
+import 'package:block_explorer/models/eth_price.dart';
 import 'package:block_explorer/screens/result_screen.dart';
 import 'package:block_explorer/services/api_services.dart';
 import 'package:block_explorer/widgets/header.dart';
@@ -17,11 +18,34 @@ class _HomeScreenState extends State<HomeScreen> {
   final formKey = GlobalKey<FormState>();
   final textEditingController = TextEditingController();
 
+  EthPrice ethPrice = EthPrice();
+  String ethSupply = 'asdfasdf';
+
   String validateInput(String input) {
     if (input.isEmpty || input == null) {
       return 'Please provide a valid Eth Wallet Address';
     }
     return null;
+  }
+
+  void init() {
+    apiService
+      ..getEtherPrice().then((value) {
+        setState(() {
+          ethPrice = value.result;
+        });
+      })
+      ..getEtherSupply().then((value) {
+        setState(() {
+          ethSupply = value.result;
+        });
+      });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    init();
   }
 
   @override
@@ -64,19 +88,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text('Search'),
                   onPressed: () async {
                     if (formKey.currentState.validate()) {
-                      await apiService
-                          .getTxList(textEditingController.text.trim())
-                          .then(
-                        (value) {
-                          return Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return ResultScreen(txModelList: value.result);
-                              },
-                            ),
-                          ).whenComplete(() => textEditingController.clear());
-                        },
-                      );
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return ResultScreen(
+                              walletAddress: textEditingController.text.trim(),
+                            );
+                          },
+                        ),
+                      ).whenComplete(() => textEditingController.clear());
                     }
                   },
                 ),
@@ -84,7 +104,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             // Text(test),
             Container(),
-            Footer(),
+            Footer(
+              ethPrice: ethPrice,
+              ethSupply: ethSupply,
+            ),
           ],
         ),
       ),
