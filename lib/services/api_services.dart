@@ -43,14 +43,14 @@ class APIServices {
     }
   }
 
-  Future<EthSupply> getEtherSupply() async {
+  Future<EthDataPrice> getEtherPrice() async {
     try {
       final response = await http.get(
-        '$kBaseURL?module=stats&action=ethsupply&apikey=$kAPIKey',
+        '$kBaseURL?module=stats&action=ethprice&apikey=$kAPIKey',
       );
 
-      if (response.statusCode == 200) {
-        return EthSupply.fromJson(jsonDecode(response.body));
+      if (jsonDecode(response.body)['status'] == '1') {
+        return EthDataPrice.fromJson(jsonDecode(response.body));
       } else {
         return null;
       }
@@ -60,14 +60,14 @@ class APIServices {
     }
   }
 
-  Future<EthDataPrice> getEtherPrice() async {
+  Future<EthSupply> getEtherSupply() async {
     try {
       final response = await http.get(
-        '$kBaseURL?module=stats&action=ethprice&apikey=$kAPIKey',
+        '$kBaseURL?module=stats&action=ethsupply&apikey=$kAPIKey',
       );
 
-      if (response.statusCode == 200) {
-        return EthDataPrice.fromJson(jsonDecode(response.body));
+      if (jsonDecode(response.body)['status'] == '1') {
+        return EthSupply.fromJson(jsonDecode(response.body));
       } else {
         return null;
       }

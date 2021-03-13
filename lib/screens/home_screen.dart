@@ -1,6 +1,5 @@
-import 'package:block_explorer/models/eth_price.dart';
 import 'package:block_explorer/screens/result_screen.dart';
-import 'package:block_explorer/services/api_services.dart';
+import 'package:block_explorer/services/form_validation.dart';
 import 'package:block_explorer/state_management/search_state_management.dart';
 import 'package:block_explorer/widgets/header.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,39 +15,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final apiService = APIServices();
   final formKey = GlobalKey<FormState>();
   final textEditingController = TextEditingController();
-
-  EthPrice ethPrice = EthPrice();
-  String ethSupply = '';
-
-  String validateInput(String input) {
-    if (input.isEmpty || input == null) {
-      return 'Please provide a valid Eth Wallet Address';
-    }
-    return null;
-  }
-
-  void init() {
-    apiService
-      ..getEtherPrice().then((value) {
-        setState(() {
-          ethPrice = value.result;
-        });
-      })
-      ..getEtherSupply().then((value) {
-        setState(() {
-          ethSupply = value.result;
-        });
-      });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    init();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     key: formKey,
                     child: TextFormField(
                       controller: textEditingController,
-                      validator: (input) => validateInput(input),
+                      validator: (input) =>
+                          FormValidation().validateSearchInput(input),
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.all(10),
                         hintText: 'Search for anything',
@@ -109,10 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             // Text(test),
             Container(),
-            Footer(
-              ethPrice: ethPrice,
-              ethSupply: ethSupply,
-            ),
+            Footer(),
           ],
         ),
       ),

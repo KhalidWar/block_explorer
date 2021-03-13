@@ -1,7 +1,37 @@
+import 'package:block_explorer/models/eth_price.dart';
+import 'package:block_explorer/services/api_services.dart';
 import 'package:flutter/material.dart';
 
-class Header extends StatelessWidget {
-  const Header({Key key}) : super(key: key);
+class Header extends StatefulWidget {
+  @override
+  _HeaderState createState() => _HeaderState();
+}
+
+class _HeaderState extends State<Header> {
+  final apiService = APIServices();
+
+  EthPrice ethPrice = EthPrice();
+  String ethSupply = '';
+
+  void init() {
+    apiService
+      ..getEtherPrice().then((value) {
+        setState(() {
+          ethPrice = value.result;
+        });
+      })
+      ..getEtherSupply().then((value) {
+        setState(() {
+          ethSupply = value.result;
+        });
+      });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +48,10 @@ class Header extends StatelessWidget {
             'Block Explorer',
             style: Theme.of(context).textTheme.headline6,
           ),
+          Spacer(),
+          Text('ETHUSD: \$${ethPrice.ethusd}'),
+          SizedBox(width: size.width * 0.01),
+          Text('ETHBTC: ${ethPrice.ethbtc}'),
         ],
       ),
     );
