@@ -27,6 +27,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   http: ^0.12.2
   lottie: ^1.0.1
+  flutter_riverpod: ^0.13.1
 
 dev_dependencies:
   flutter_test:

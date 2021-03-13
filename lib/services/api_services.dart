@@ -14,11 +14,10 @@ class APIServices {
   Future<AccountBalance> getAccountBalance(String address) async {
     try {
       final response = await http.get(
-        '$kBaseURL?module=$kModuleAccount&action=$kActionBalance&address=$address&tag=$kTagLatest&apikey=$kAPIKey',
+        '$kBaseURL?module=$kModule&action=$kActionBalance&address=$address&tag=$kTagLatest&apikey=$kAPIKey',
       );
 
-      if (response.statusCode == 200) {
-        print(response.body);
+      if (jsonDecode(response.body)['status'] == '1') {
         return AccountBalance.fromJson(jsonDecode(response.body));
       } else {
         return null;
@@ -31,10 +30,10 @@ class APIServices {
   Future<TxDataModel> getTxList(String address) async {
     try {
       final response = await http.get(
-        '$kBaseURL?module=$kModuleAccount&action=$kActionTxList&address=$address&tag=$kTagLatest&apikey=$kAPIKey',
+        '$kBaseURL?module=$kModule&action=$kActionTxList&address=$address&tag=$kTagLatest&apikey=$kAPIKey',
       );
 
-      if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['status'] == '1') {
         return TxDataModel.fromJson(jsonDecode(response.body));
       } else {
         return null;
@@ -51,7 +50,6 @@ class APIServices {
       );
 
       if (response.statusCode == 200) {
-        print(response.body);
         return EthSupply.fromJson(jsonDecode(response.body));
       } else {
         return null;
@@ -69,7 +67,6 @@ class APIServices {
       );
 
       if (response.statusCode == 200) {
-        print(response.body);
         return EthDataPrice.fromJson(jsonDecode(response.body));
       } else {
         return null;

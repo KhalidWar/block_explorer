@@ -1,9 +1,11 @@
 import 'package:block_explorer/models/eth_price.dart';
 import 'package:block_explorer/screens/result_screen.dart';
 import 'package:block_explorer/services/api_services.dart';
+import 'package:block_explorer/state_management/search_state_management.dart';
 import 'package:block_explorer/widgets/header.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 
 import '../widgets/footer.dart';
@@ -19,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final textEditingController = TextEditingController();
 
   EthPrice ethPrice = EthPrice();
-  String ethSupply = 'asdfasdf';
+  String ethSupply = '';
 
   String validateInput(String input) {
     if (input.isEmpty || input == null) {
@@ -91,9 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) {
-                            return ResultScreen(
-                              walletAddress: textEditingController.text.trim(),
-                            );
+                            context
+                                    .read(searchStateManagementProvider)
+                                    .walletAddress =
+                                textEditingController.text.trim();
+
+                            return ResultScreen();
                           },
                         ),
                       ).whenComplete(() => textEditingController.clear());

@@ -1,44 +1,28 @@
+import 'package:block_explorer/models/account_balance.dart';
 import 'package:block_explorer/models/tx_model.dart';
-import 'package:block_explorer/services/api_services.dart';
+import 'package:block_explorer/state_management/search_state_management.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ResultScreen extends StatefulWidget {
-  const ResultScreen({Key key, this.walletAddress}) : super(key: key);
+final getTxListProvider = FutureProvider<TxDataModel>((ref) {
+  final walletAddress = ref.read(searchStateManagementProvider).walletAddress;
+  return ref.read(searchStateManagementProvider).getTxList(walletAddress);
+});
 
-  final String walletAddress;
+final getWalletBalanceProvider = FutureProvider<AccountBalance>((ref) {
+  final walletAddress = ref.read(searchStateManagementProvider).walletAddress;
+  return ref
+      .read(searchStateManagementProvider)
+      .getAccountBalance(walletAddress);
+});
 
+class ResultScreen extends ConsumerWidget {
   @override
-  _ResultScreenState createState() => _ResultScreenState();
-}
-
-class _ResultScreenState extends State<ResultScreen> {
-  final apiService = APIServices();
-  List<TxModel> txModelList = [];
-  String walletBalance = '0';
-
-  void init() async {
-    apiService
-      ..getTxList(widget.walletAddress).then((value) {
-        setState(() {
-          txModelList = value.result;
-        });
-      })
-      ..getAccountBalance(widget.walletAddress).then((value) {
-        setState(() {
-          walletBalance = value.result;
-        });
-      });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    init();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ScopedReader watch) {
     final size = MediaQuery.of(context).size;
+
+    final walletBalanceAsyncValue = watch(getWalletBalanceProvider);
+    final txListAsyncValue = watch(getTxListProvider);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -46,7 +30,11 @@ class _ResultScreenState extends State<ResultScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(walletBalance),
+            walletBalanceAsyncValue.when(
+              loading: () => CircularProgressIndicator(),
+              data: (data) => Text(data.result),
+              error: (error, stackTrace) => Container(),
+            ),
             Container(
               padding: EdgeInsets.only(right: size.width * 0.1),
               child: Column(
@@ -56,23 +44,25 @@ class _ResultScreenState extends State<ResultScreen> {
                     'Transactions',
                     style: Theme.of(context).textTheme.headline5,
                   ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: txModelList.length,
-                    itemBuilder: (_, index) {
-                      final tx = txModelList[index];
+                  txListAsyncValue.when(
+                    loading: () => CircularProgressIndicator(),
+                    data: (data) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: data.result.length,
+                        itemBuilder: (_, index) {
+                          final transaction = data.result[index];
 
-                      return ListTile(
-                        dense: true,
-                        leading: Icon(Icons.done),
-                        title: Text(tx.confirmations),
-                        subtitle: Text(tx.from),
-                        // trailing: IconButton(
-                        //   icon: Icon(Icons.open_in_new),
-                        //   onPressed: () {},
-                        // ),
+                          return ListTile(
+                            dense: true,
+                            leading: Icon(Icons.done),
+                            title: Text(transaction.confirmations),
+                            subtitle: Text(transaction.from),
+                          );
+                        },
                       );
                     },
+                    error: (error, stackTrace) => Container(),
                   ),
                 ],
               ),
