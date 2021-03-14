@@ -3,6 +3,8 @@ import 'package:block_explorer/widgets/header.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+import '../constants.dart';
+
 class ErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,7 @@ class ErrorScreen extends StatelessWidget {
                           .headline4
                           .copyWith(color: Colors.red),
                     ),
-                    Lottie.asset('lottie/404.json'),
+                    Lottie.network(kErrorScreenLottie),
                   ],
                 ),
               ),

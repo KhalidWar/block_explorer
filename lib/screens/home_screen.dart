@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 
+import '../constants.dart';
 import '../widgets/footer.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -64,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Container(
                   height: size.height * 0.3,
-                  child: Lottie.asset('lottie/search.json'),
+                  child: Lottie.network(kHomeScreenLottie),
                 ),
                 Container(
                   width: size.width * 0.3,
