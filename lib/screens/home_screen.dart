@@ -1,5 +1,7 @@
+import 'package:block_explorer/screens/error_screen.dart';
 import 'package:block_explorer/screens/result_screen.dart';
 import 'package:block_explorer/services/form_validation.dart';
+import 'package:block_explorer/state_management/providers.dart';
 import 'package:block_explorer/state_management/search_state_management.dart';
 import 'package:block_explorer/widgets/header.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,6 +24,35 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
+    void search() async {
+      if (formKey.currentState.validate()) {
+        await context
+            .read(apiServiceProvider)
+            .getAccountBalance(textEditingController.text.trim())
+            .then((value) {
+          if (value == null) {
+            Navigator.of(context)
+                .push(
+                  MaterialPageRoute(
+                    builder: (context) => ErrorScreen(),
+                  ),
+                )
+                .whenComplete(() => textEditingController.clear());
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) {
+                  context.read(searchStateManagementProvider).walletAddress =
+                      textEditingController.text.trim();
+                  return ResultScreen();
+                },
+              ),
+            ).whenComplete(() => textEditingController.clear());
+          }
+        });
+      }
+    }
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
@@ -43,6 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       controller: textEditingController,
                       validator: (input) =>
                           FormValidation().validateSearchInput(input),
+                      onFieldSubmitted: (input) => search(),
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.all(10),
                         hintText: 'Search for anything',
@@ -57,27 +89,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(height: size.height * 0.03),
                 ElevatedButton(
                   child: Text('Search'),
-                  onPressed: () async {
-                    if (formKey.currentState.validate()) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) {
-                            context
-                                    .read(searchStateManagementProvider)
-                                    .walletAddress =
-                                textEditingController.text.trim();
-
-                            return ResultScreen();
-                          },
-                        ),
-                      ).whenComplete(() => textEditingController.clear());
-                    }
-                  },
+                  onPressed: () => search(),
                 ),
               ],
             ),
-            // Text(test),
-            Container(),
             Footer(),
           ],
         ),
