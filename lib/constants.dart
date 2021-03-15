@@ -10,3 +10,5 @@ const kHomeScreenLottie =
     'https://assets3.lottiefiles.com/packages/lf20_tnrzlN.json';
 const kErrorScreenLottie =
     'https://assets10.lottiefiles.com/private_files/lf30_tonsVH.json';
+const kKhalidWarURL = 'https://khalidwar.com/';
+const kEtherscanAPIURL = 'https://etherscan.io/apis';

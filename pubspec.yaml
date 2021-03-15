@@ -28,6 +28,7 @@ dependencies:
   http: ^0.12.2
   lottie: ^1.0.1
   flutter_riverpod: ^0.13.1
+  url_launcher: ^6.0.2
 
 dev_dependencies:
   flutter_test:
